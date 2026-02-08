@@ -7,6 +7,31 @@ below!
 Unreleased
 ----------
 
+New features:
+
+Bug fixes:
+
+For packagers:
+
+Other changes:
+
+- :doc:`plugins/lyrics`: Disable ``tekstowo`` by default because it blocks the
+  beets User-Agent.
+- :doc:`plugins/lastgenre`: The ``separator`` configuration option is
+  deprecated. Genres are now stored as a list in the ``genres`` field and
+  written to files as individual genre tags. The separator option has no effect
+  and will be removed in a future version.
+
+2.6.1 (February 02, 2026)
+-------------------------
+
+Bug fixes:
+
+- Make ``packaging`` a required dependency. :bug:`6332`
+
+2.6.0 (February 01, 2026)
+-------------------------
+
 Beets now requires Python 3.10 or later since support for EOL Python 3.9 has
 been dropped.
 
@@ -60,9 +85,23 @@ New features:
   of brackets are supported and a new ``bracket_keywords`` configuration option
   allows customizing the keywords. Setting ``bracket_keywords`` to an empty list
   matches any bracket content regardless of keywords.
+- :doc:`plugins/discogs`: Added support for multi value fields. :bug:`6068`
+- :doc:`plugins/embedart`: Embedded arts can now be cleared during import with
+  the ``clearart_on_import`` config option. Also, ``beet clearart`` is only
+  going to update the files matching the query and with an embedded art, leaving
+  untouched the files without.
+- :doc:`plugins/fish`: Filenames are now completed in more places, like after
+  ``beet import``.
+- :doc:`plugins/random`: Added ``--field`` option to specify which field to use
+  for equal-chance sampling (default: ``albumartist``).
 
 Bug fixes:
 
+- :doc:`/plugins/lastgenre`: Canonicalize genres when ``force`` and
+  ``keep_existing`` are ``on``, yet no genre info on lastfm could be found.
+  :bug:`6303`
+- Handle potential OSError when unlinking temporary files in ArtResizer.
+  :bug:`5615`
 - :doc:`/plugins/spotify`: Updated Spotify API credentials. :bug:`6270`
 - :doc:`/plugins/smartplaylist`: Fixed an issue where multiple queries in a
   playlist configuration were not preserving their order, causing items to
@@ -105,6 +144,17 @@ Bug fixes:
 - :doc:`/plugins/ftintitle`: Fixed artist name splitting to prioritize explicit
   featuring tokens (feat, ft, featuring) over generic separators (&, and),
   preventing incorrect splits when both are present.
+- :doc:`reference/cli`: Fix 'from_scratch' option for singleton imports: delete
+  all (old) metadata when new metadata is applied. :bug:`3706`
+- :doc:`/plugins/convert`: ``auto_keep`` now respects ``no_convert`` and
+  ``never_convert_lossy_files`` when deciding whether to copy/transcode items,
+  avoiding extra lossy duplicates.
+- :doc:`plugins/discogs`: Fixed unexpected flex attr from the Discogs plugin.
+  :bug:`6177`
+- Errors in metadata plugins during autotage process will now be logged but
+  won't crash beets anymore. If you want to raise exceptions instead, set the
+  new configuration option ``raise_on_error`` to ``yes`` :bug:`5903`,
+  :bug:`4789`.
 
 For plugin developers:
 
@@ -144,10 +194,10 @@ Other changes:
   unavailable, enabling ``importorskip`` usage in pytest setup.
 - Finally removed gmusic plugin and all related code/docs as the Google Play
   Music service was shut down in 2020.
-- :doc:`plugins/lastgenre`: The ``separator`` configuration option is
-  deprecated. Genres are now stored as a list in the ``genres`` field and
-  written to files as individual genre tags. The separator option has no effect
-  and will be removed in a future version.
+- Updated color documentation with ``bright_*`` and ``bg_bright_*`` entries.
+- Moved `beets/random.py` into `beetsplug/random.py` to cleanup core module.
+- dbcore: Allow models to declare SQL indices; add an ``items.album_id`` index
+  to speed up ``album.items()`` queries. :bug:`5809`
 
 2.5.1 (October 14, 2025)
 ------------------------

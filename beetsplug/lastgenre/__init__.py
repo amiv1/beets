@@ -39,8 +39,7 @@ from beets.util import plurality, unique_list
 
 if TYPE_CHECKING:
     import optparse
-    from collections.abc import Iterable
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
 
     from beets.library import LibModel
 
@@ -471,13 +470,15 @@ class LastGenrePlugin(plugins.BeetsPlugin):
                     return result
 
         # Nothing found, leave original if configured and valid.
-        # Nothing found, leave original if configured and valid.
-        if (
-            genres
-            and self.config["keep_existing"]
-            and (valid_genres := self._filter_valid(genres))
-        ):
-            return valid_genres, "original fallback"
+        if obj.genres and self.config["keep_existing"]:
+            if valid_genres := self._filter_valid(obj.genres):
+                return valid_genres, "original fallback"
+            # If the original genre doesn't match a whitelisted genre, check
+            # if we can canonicalize it to find a matching, whitelisted genre!
+            if result := _try_resolve_stage(
+                "original fallback", keep_genres, []
+            ):
+                return result
 
         # Return fallback as a list.
         if fallback := self.config["fallback"].get():

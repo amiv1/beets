@@ -607,12 +607,8 @@ class MusicBrainzPlugin(MusicBrainzAPIMixin, MetadataSourcePlugin):
         if release.get("disambiguation"):
             info.albumdisambig = release.get("disambiguation")
 
-        # Get the "classic" Release type. This data comes from a legacy API
-        # feature before MusicBrainz supported multiple release types.
-        if "type" in release["release-group"]:
-            reltype = release["release-group"]["type"]
-            if reltype:
-                info.albumtype = reltype.lower()
+        if reltype := release["release-group"].get("primary-type"):
+            info.albumtype = reltype.lower()
 
         # Set the new-style "primary" and "secondary" release types.
         albumtypes = []
@@ -792,7 +788,13 @@ class MusicBrainzPlugin(MusicBrainzAPIMixin, MetadataSourcePlugin):
             self._log.debug("Invalid MBID ({}).", album_id)
             return None
 
-        res = self.mb_api.get_release(albumid, includes=RELEASE_INCLUDES)
+        # A 404 error here is fine. e.g. re-importing a release that has
+        # been deleted on MusicBrainz.
+        try:
+            res = self.mb_api.get_release(albumid, includes=RELEASE_INCLUDES)
+        except HTTPNotFoundError:
+            self._log.debug("Release {} not found on MusicBrainz.", albumid)
+            return None
 
         # resolve linked release relations
         actual_res = None
