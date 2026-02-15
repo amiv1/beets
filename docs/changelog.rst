@@ -9,9 +9,22 @@ below!
 Unreleased
 ----------
 
-..
-    New features
-    ~~~~~~~~~~~~
+New features
+~~~~~~~~~~~~
+
+- Add native support for multiple genres per album/track. The ``genres`` field
+  now stores genres as a list and is written to files as multiple individual
+  genre tags (e.g., separate GENRE tags for FLAC/MP3). The
+  :doc:`plugins/musicbrainz`, :doc:`plugins/beatport`, :doc:`plugins/discogs`
+  and :doc:`plugins/lastgenre` plugins have been updated to populate the
+  ``genres`` field as a list.
+
+  **Migration**: Existing libraries with comma-separated, semicolon-separated,
+  or slash-separated genre strings (e.g., ``"Rock, Alternative, Indie"``) are
+  automatically migrated to the ``genres`` list when you first run beets after
+  upgrading. The migration runs once when the database schema is updated,
+  splitting genre strings and writing the changes to both the database and media
+  files. No manual action or ``mbsync`` is required.
 
 Bug fixes
 ~~~~~~~~~
@@ -25,19 +38,23 @@ Bug fixes
   than 500 tracks. :bug:`6355`
 - :doc:`plugins/badfiles`: Fix number of found errors in log message
 
-..
-    For plugin developers
-    ~~~~~~~~~~~~~~~~~~~~~
+For plugin developers
+~~~~~~~~~~~~~~~~~~~~~
+
+- If you maintain a metadata source plugin that populates the ``genre`` field,
+  please update it to populate a list of ``genres`` instead. You will see a
+  deprecation warning for now, but support for populating the single ``genre``
+  field will be removed in version ``3.0.0``.
 
 Other changes
 ~~~~~~~~~~~~~
 
 - :doc:`plugins/lyrics`: Disable ``tekstowo`` by default because it blocks the
   beets User-Agent.
-- :doc:`plugins/lastgenre`: The ``separator`` configuration option is
-  deprecated. Genres are now stored as a list in the ``genres`` field and
-  written to files as individual genre tags. The separator option has no effect
-  and will be removed in a future version.
+- :doc:`plugins/lastgenre`: The ``separator`` configuration option is removed.
+  Since genres are now stored as a list in the ``genres`` field and written to
+  files as individual genre tags, this option has no effect and has been
+  removed.
 
 2.6.1 (February 02, 2026)
 -------------------------
@@ -55,21 +72,6 @@ been dropped.
 
 New features
 ~~~~~~~~~~~~
-
-- Add native support for multiple genres per album/track. The ``genres`` field
-  now stores genres as a list and is written to files as multiple individual
-  genre tags (e.g., separate GENRE tags for FLAC/MP3). The single ``genre``
-  field is automatically synchronized to contain the first genre from the list
-  for backward compatibility. The :doc:`plugins/musicbrainz`,
-  :doc:`plugins/beatport`, and :doc:`plugins/lastgenre` plugins have been
-  updated to populate the ``genres`` field as a list.
-
-  **Migration**: Existing libraries with comma-separated, semicolon-separated,
-  or slash-separated genre strings (e.g., ``"Rock, Alternative, Indie"``) are
-  automatically migrated to the ``genres`` list when you first run beets after
-  upgrading. The migration runs once when the database schema is updated,
-  splitting genre strings and writing the changes to both the database and media
-  files. No manual action or ``mbsync`` is required.
 
 - :doc:`plugins/fetchart`: Added config setting for a fallback cover art image.
 - :doc:`plugins/ftintitle`: Added argument for custom feat. words in ftintitle.
