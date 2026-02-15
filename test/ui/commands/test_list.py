@@ -64,6 +64,6 @@ class ListTest(BeetsTestCase):
         assert "the artist - the album - 0001" == stdout.getvalue().strip()
 
     def test_list_album_format(self):
-        stdout = self._run_list(album=True, fmt="$genre")
+        stdout = self._run_list(album=True, fmt="$genres")
         assert "the genre" in stdout.getvalue()
         assert "the album" not in stdout.getvalue()
